@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">DetectAnswerSheets</string>
+    <string name="choosePhoto">从相册中选择</string>
+</resources>
