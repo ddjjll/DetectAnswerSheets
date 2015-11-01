@@ -3,34 +3,35 @@ package com.opencv.tuxin.detectanswersheets;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.Toast;
 
 public class ShowPhotoActivity extends Activity {
 
 
-    private ImageView showDetectPicture;
-    private ImageView errorAnswersPicture;
-    private Bitmap warpImage;
+    private ImageView showWarpPicture;
+    private ImageView showErrorAnswersPicture;
+    private ImageView showCorrectAnswersPicture;
     private static String imgPath;
+    private Bitmap errorAnswersPicture;
+    private Bitmap correctAnswersPicture;
+    private Bitmap warpPicture;
     private TabHost tabHost;
-    private String[] tabHostTabSpec = {"showDetectPicture","showErrorAnswersPicture","showCorrectAnswersPicture"};
-    int[] studentAnswers = new int[AnswerSheetBase.SUM_OF_QUESTIONS];
+    private String[] tabHostTabSpec = {"showWarpPicture","showErrorAnswersPicture","showCorrectAnswersPicture"};
+    private int[] studentAnswers = new int[AnswerSheetBase.SUM_OF_QUESTIONS];
+    protected int[] correctAnswers = new int[AnswerSheetBase.SUM_OF_QUESTIONS];
+    private AnswerSheetBase answerSheetBase = new AnswerSheetBase();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_photo);
 
-        showDetectPicture = (ImageView) findViewById(R.id.showDetectPicture);
+        showWarpPicture = (ImageView) findViewById(R.id.showDetectPicture);
+
 
         /// 设置 tabHost
         tabHost = (TabHost)findViewById(R.id.myTabHost);
@@ -48,15 +49,19 @@ public class ShowPhotoActivity extends Activity {
         /// 从 Intent 中得到 imgPath
         Intent intent = getIntent();
         imgPath = intent.getStringExtra("imgPath");
-        AnswerSheetBase answerSheetBase = new AnswerSheetBase();
-
+        /// 给 AnswerSheetBase 设置 imgPath （必须）
         answerSheetBase.setImgPath(imgPath);
-        warpImage = answerSheetBase.getResultImage();
-        showDetectPicture.setImageBitmap(warpImage);
 
-        studentAnswers = answerSheetBase.getStudentAnswers();
-        for (int i = 0; i < 54 ; i++)
-            Log.e(AnswerSheetBase.TAG, "studentAnswers"+ (i + 1) + " = " + studentAnswers[i]);
+        /// 得到检测后的图片
+        warpPicture = answerSheetBase.getWarpPicture();
+        showWarpPicture.setImageBitmap(warpPicture);
+
+        /// 因为得到 studentAnswers 需要一定的时间，所以放在进程里进行，虽然
+        /// 之后的 OnTabChangeListener 里用到了 studentAnswers 相关的东西，
+        /// 但是通常来说，没等我们开始按按钮，进程就能完成了，所以这样设置没问题。
+        MyTask myTask = new MyTask();
+        myTask.execute();
+
 
         tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
             public void onTabChanged(String tabId) {
@@ -64,39 +69,28 @@ public class ShowPhotoActivity extends Activity {
                     Toast toast = Toast.makeText(getApplicationContext(), "现在是" + tabId + "标签", Toast.LENGTH_SHORT);
                     toast.show();
                 } else if (tabId.equals(tabHostTabSpec[1])) {
-                    errorAnswersPicture = (ImageView) findViewById(R.id.showErrorAnswersPicture);
-                    errorAnswersPicture.setImageBitmap(warpImage);
+                    showErrorAnswersPicture = (ImageView) findViewById(R.id.showErrorAnswersPicture);
+                    showErrorAnswersPicture.setImageBitmap(errorAnswersPicture);
+                } else{
+                    showCorrectAnswersPicture = (ImageView)findViewById(R.id.showCorrectAnswersPicture);
+                    showCorrectAnswersPicture.setImageBitmap(correctAnswersPicture);
                 }
             }
         });
- /*       //圆
-        Paint paint=new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        Canvas canvas=new Canvas(bitmap);
-        int cx=100;
-        int cy=100;
-        int radius=20;
-        canvas.drawCircle(cx, cy, radius, paint);
-        chooseView.setImageBitmap(bitmap);
-
-/*        //绘制字体
-        Paint paint=new Paint();
-        paint.setColor(Color.YELLOW);
-        paint.setTextSize(40);
-        paint.setTypeface(Typeface.DEFAULT_BOLD);//设置字体
-        //引用外部字体
-        //Typeface typeface=Typeface.createFromAsset(getAssets(), "newFont.ttf");
-        //paint.setTypeface(typeface);
-
-        Canvas canvas=new Canvas(warpImage);
-        canvas.drawText("98 分", 50, 100, paint);
-        showDetectPicture.setImageBitmap(warpImage);*/
     }
-
-
-
-
-
+    private class MyTask extends AsyncTask<Void, Void, Void>{
+        @Override
+        protected Void doInBackground(Void... params) {
+            /// 设置正确答案
+            for (int i = 0; i < AnswerSheetBase.SUM_OF_QUESTIONS; i++)
+                correctAnswers[i] = i % 4 + 1;
+            answerSheetBase.setCorrectAnswers(correctAnswers);
+            /// 得到错题的图片
+            errorAnswersPicture = answerSheetBase.getErrorAnswersPicture();
+            /// 得到正确选项的图片
+            correctAnswersPicture = answerSheetBase.getCorrectAnswersPicture();
+            return null;
+        }
+    }
 
 }
