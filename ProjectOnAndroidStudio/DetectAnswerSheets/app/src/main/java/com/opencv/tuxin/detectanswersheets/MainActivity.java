@@ -13,10 +13,12 @@ import android.widget.Button;
 public class MainActivity extends Activity {
     private static final int CHOOSE_PHOTO = 1;
     private Button btnChoosePhoto;
+    private Button btnCreateAnswerSheet;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        /// 创建 choosePhoto 按钮，并设置监听器
         btnChoosePhoto = (Button) findViewById(R.id.btnChoosePhoto);
         btnChoosePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -27,6 +29,18 @@ public class MainActivity extends Activity {
                 startActivityForResult(Intent.createChooser(intent,"Select Picture"),CHOOSE_PHOTO);
             }
         });
+
+        /// 创建 createAnswerSheet 按钮，并设置监听器
+        btnCreateAnswerSheet = (Button) findViewById(R.id.btnCreateAnswerSheet);
+        btnCreateAnswerSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,ShowCreateAnswerSheetActivity.class);
+                MainActivity.this.startActivity(intent);
+            }
+        });
+
+
     }
 
     @Override

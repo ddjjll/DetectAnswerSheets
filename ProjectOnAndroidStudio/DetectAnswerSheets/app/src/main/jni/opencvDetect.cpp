@@ -45,8 +45,7 @@ JNIEXPORT jobject JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBa
     convertScaleAbs( gradient, abs_gradient);
 
     /// 释放 grad_x 和 grad_y
-    grad_x = Mat();
-    grad_y = Mat();
+
     img_gray = Mat();
     ///***********结束 获取包含高水平梯度和低垂着梯度的灰度图***********
 
@@ -56,8 +55,8 @@ JNIEXPORT jobject JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBa
     threshold(abs_gradient, abs_gradient, 100, 255,  CV_THRESH_BINARY);
     /// 膨胀、腐蚀得到更好的轮廓
     dilate(abs_gradient, abs_gradient, Mat(), Point(-1, -1), 2);
-    erode(abs_gradient, abs_gradient, Mat(), Point(-1, -1), 3);
-    dilate(abs_gradient, abs_gradient, Mat(), Point(-1, -1), 2);
+    erode(abs_gradient, abs_gradient, Mat(), Point(-1, -1), 4);
+    dilate(abs_gradient, abs_gradient, Mat(), Point(-1, -1), 3);
 
     /// 寻找轮廓并剔除过小的轮廓
     vector<vector<Point> > contours;
@@ -91,7 +90,7 @@ JNIEXPORT jobject JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBa
     /// 参数为：输入图像的最大轮廓，输出结果，估计精度，是否闭合
     approxPolyDP(Mat(contours[largest_index]), poly, arcLength(Mat(contours[largest_index]), true) * 0.01, true);
     /// 如果找到的轮廓为四边形，取出他的角点值
-    if (poly.size() == 4 && largest_contour > img_reset.cols * img_reset.rows * 0.4) {
+    if (poly.size() == 4 && largest_contour > img_reset.cols * img_reset.rows * 0.2) {
         int center_x = 0;
         int center_y = 0;
         /// 计算出四边形的中心点的 x 值和 y 值
@@ -142,13 +141,31 @@ JNIEXPORT jobject JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBa
         Mat roi_detection_again_contours;
         cvtColor(roi_detection_again,roi_detection_again_contours,CV_BGR2GRAY);
 
-        Canny(roi_detection_again_contours, roi_detection_again_contours, 50, 200, 3);
-        blur(roi_detection_again_contours, roi_detection_again_contours, Size(3,3));
-        /// 膨胀得到更好的轮廓
-        dilate(roi_detection_again_contours, roi_detection_again_contours, Mat(), Point(-1, -1), 1);
+        Mat grad_x, grad_y;
+        Mat gradient,abs_gradient;
+        /// Gradient X
+        Sobel( roi_detection_again_contours, grad_x, ddepth, 1, 0, -1);
+        /// Gradient Y
+        Sobel( roi_detection_again_contours, grad_y, ddepth, 0, 1, -1);
+
+        /// 相减
+        subtract(grad_x, grad_y, gradient);
+        convertScaleAbs( gradient, abs_gradient);
+
+        blur(abs_gradient, abs_gradient, Size(3,3));
+        threshold(abs_gradient, abs_gradient, 100, 255,  CV_THRESH_BINARY);
+        /// 膨胀、腐蚀得到更好的轮廓
+        erode(abs_gradient, abs_gradient, Mat(), Point(-1, -1), 1);
+        dilate(abs_gradient, abs_gradient, Mat(), Point(-1, -1), 1);
+
+        Canny(abs_gradient, abs_gradient, 50, 200, 3);
 
         /// 这里只寻找外表轮廓，（cv_chain_approx_none表示储存找到轮廓的四个角点）
-        findContours(roi_detection_again_contours, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+        findContours(abs_gradient, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+
+        grad_x = Mat();
+        grad_y = Mat();
+        abs_gradient = Mat();
         /// 寻找最大的轮廓
         largest_contour = 0;
         for(int i = 0; i < contours.size(); i++){
@@ -162,7 +179,7 @@ JNIEXPORT jobject JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBa
             need_detection_again = true;
             /// 查看最大轮廓是否为四边形
             /// 参数为：输入图像的最大轮廓，输出结果，估计精度，是否闭合
-            approxPolyDP(Mat(contours[largest_index]), poly, arcLength(Mat(contours[largest_index]), true) * 0.03, true);
+            approxPolyDP(Mat(contours[largest_index]), poly, arcLength(Mat(contours[largest_index]), true) * 0.01, true);
             /// 如果找到的轮廓为四边形，取出他的角点值
             if (poly.size() == 4) {
                 int center_x = 0;
@@ -227,6 +244,7 @@ JNIEXPORT jobject JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBa
     roi_detection_again = Mat();
     ///***********结束 warp 方法***********
 
+
     /// 把投影后的图片转为 AnswerSheetBase 类的 imgDataWarp
     int *outImage = new int[img_warp.rows* img_warp.cols];
     int *p = outImage;
@@ -245,9 +263,11 @@ JNIEXPORT jobject JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBa
     env->ReleaseIntArrayElements(result,outImage,0);
     env->ReleaseIntArrayElements(buf,cbuf,0);
 
+
     //env->SetObjectField(m_obj,m_fid_result,result);
     return m_obj;
 };
+
 
 JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBase_getStudentAnswers
         (JNIEnv * env, jobject obj, jintArray buf, jint w, jint h){
@@ -339,7 +359,7 @@ JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheet
             }
             /// 判断该选项像素计数，如果达到一定的百分比，判定为选取了该选项
             /// 如果检测到 B 和 D 时，把像判定选取的阀值稍微提高一点
-            if(answers_option == 2 || answers_option == 4){
+            if(answers_option == 2){
                 if (cpt_pixel > (w_letter * h_letter) * PERCENT_OP_B ) {
                     studentAnswers[i] = answers_option;
                     cpt_choose++;

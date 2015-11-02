@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -23,8 +24,8 @@ public class AnswerSheetBase{
     private int[] correctAnswers;
     private Bitmap warpPicture;
 
-    private int wResize = 1080;
-    private int hResize = 1920;
+    private int wResize;
+    private int hResize;
 
     private boolean isGetDataFromNative = false;
 
@@ -37,8 +38,22 @@ public class AnswerSheetBase{
      *  getStudentAnswers() 得到 studentAnswers。                  */
     public void setImgPath(String imgPath){
         this.imgPath = imgPath;
+        getResize();
         getDataFromNative();
     }
+
+    private void getResize(){
+        /// 得到 options 属性
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        /// 设置 inJustDecodeBounds = true 后，解析图片只解析边界大小
+        options.inJustDecodeBounds = true;
+        Bitmap bitmap = (Bitmap) BitmapFactory.decodeFile(imgPath,options);
+        float scale;
+        scale = (float) ((1123.0/options.outWidth <=  794.0/options.outHeight)? 1123.0/options.outWidth : 794.0/options.outHeight);
+        this.wResize = (int) (options.outWidth * scale * 1.2) ;
+        this.hResize = (int) (options.outHeight * scale * 1.2) ;
+    }
+
 
     /*  调用 native 方法，得到 resultInt，有了该数组，就可以调用
      *  getStudentAnswers() 和 getStudentNumbers() 等函数。
@@ -66,7 +81,7 @@ public class AnswerSheetBase{
     /*  把像素值转换为 warpPicture。 未完成，需要在 res 里放入图片，说明检测失败。*/
     protected Bitmap getWarpPicture(){
         if (imgPath != null && !isImgFormPathTooSmall() && dataFromNative.isRectangle) {
-            warpPicture = Bitmap.createBitmap(wResize, hResize, Bitmap.Config.RGB_565);
+            warpPicture = Bitmap.createBitmap(wResize, hResize, Bitmap.Config.ARGB_8888);
             if (dataFromNative.isRectangle == true) {
                 warpPicture.setPixels(resultInt, 0, wResize, 0, 0, wResize, hResize);
             } else {
@@ -142,9 +157,9 @@ public class AnswerSheetBase{
         if (imgPath != null && !isImgFormPathTooSmall() && dataFromNative.isRectangle) {
             studentAnswers = getStudentAnswers(dataFromNative.imageDataWarp, wResize, hResize);
 
-            for (int i = 0; i < studentAnswers.length; i++) {
-                Log.e(TAG, "studentAnswers" + (i + 1) + " = " + studentAnswers[i]);
-            }
+            //for (int i = 0; i < studentAnswers.length; i++) {
+              //  Log.e(TAG, "studentAnswers" + (i + 1) + " = " + studentAnswers[i]);
+            //}
             /// 按质量压缩图片避免同时存在三张很大的图片
             errorAnswersPicture = compressByQuality(warpPicture).copy(Bitmap.Config.RGB_565, true);
             Canvas canvas = new Canvas(errorAnswersPicture);
@@ -158,7 +173,7 @@ public class AnswerSheetBase{
                     int rows = i / 3;
                     int cx = (int) (0.05 * wResize + 0.345 * cols * wResize);
                     int cy = (int) (0.3 * hResize + 0.0395 * rows * hResize);
-                    int radius = 25;
+                    int radius = 15;
                     canvas.drawCircle(cx, cy, radius, paint);
                 }
             }
@@ -237,7 +252,7 @@ public class AnswerSheetBase{
         Bitmap compressedBitmap = null;
         if (bitmap != null) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int quality = 60;
+            int quality = 80;
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos);
             //Log.e(TAG, "质量压缩到原来的" + quality + "%时大小为：" + baos.toByteArray().length + "byte");
             compressedBitmap = BitmapFactory.decodeByteArray(baos.toByteArray(), 0, baos.toByteArray().length);
@@ -246,6 +261,99 @@ public class AnswerSheetBase{
             compressedBitmap = Bitmap.createBitmap(wResize, hResize, Bitmap.Config.RGB_565);
         }
         return compressedBitmap;
+    }
+
+    /*  建立一张新的答题卡，现在每次建立都是一样的，而且没有设置答题卡的
+     *  名字、答题卡等信息。
+     *  之后的目标：用户可以根据自己的需求调整答题卡的大小，所以我们需要
+     *  输入参数，表明题目数量、答题卡名字，如果设置了二维码，还可以设置
+     *  读取二维码，直接得出这套答题卡的正确答案。*/
+    public static Bitmap createAnswerSheet(){
+        int w = 561;
+        int h = 794;
+        int wBorder = (int) (0.95 * w);
+        int hBorder = (int) (0.95 * h);
+        Bitmap bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.RGB_565);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setStrokeWidth(3.0f);
+        paint.setStyle(Paint.Style.STROKE);
+        canvas.drawRGB(255, 255, 0);
+
+        /// 创建边框
+        canvas.drawRect(new Rect((int)(w * 0.025),
+                                (int)(h * 0.025),
+                                (int)(w * 0.025 + wBorder),
+                                (int)(0.025 * h + hBorder)), paint);
+
+        paint.setStrokeWidth(1.0f);
+        /// 创建名字边框
+        canvas.drawRect(new Rect((int)(w * 0.025 + wBorder * 0.025),
+                                (int)(h * 0.025 + hBorder * 0.015),
+                                (int)(w * 0.025 + wBorder * 0.325),
+                                (int)(0.025 * h + hBorder * 0.115)), paint);
+        /// 创建二维码边框
+        canvas.drawRect(new Rect((int)(w * 0.025 + wBorder * 0.025),
+                                (int)(h * 0.025 + hBorder * 0.125),
+                                (int)(w * 0.025 + wBorder * 0.325),
+                                (int)(0.025 * h + hBorder * 0.275)), paint);
+        /// 创建学号边框
+        canvas.drawRect(new Rect((int)(w * 0.025 + wBorder * 0.375),
+                                (int)(h * 0.025 + hBorder * 0.015),
+                                (int)(w * 0.025 + wBorder * 0.775),
+                                (int)(0.025 * h + hBorder * 0.275)), paint);
+        /// 画上分割线
+        for (int i = 0; i < 7; i++){
+            canvas.drawLine((float)(w * 0.025 + wBorder * 0.425 + i * wBorder * 0.05),
+                            (float)(h * 0.025 + hBorder * 0.015),
+                            (float)(w * 0.025 + wBorder * 0.425 + i * wBorder * 0.05),
+                            (float)(h * 0.025 + hBorder * 0.275),paint);
+        }
+        /// 创建学科边框
+        canvas.drawRect(new Rect((int)(w * 0.025 + wBorder * 0.825),
+                                (int)(h * 0.025 + hBorder * 0.015),
+                                (int)(w * 0.025 + wBorder * 0.975),
+                                (int)(0.025 * h + hBorder * 0.275)), paint);
+        ///***********写上选项和数字************
+
+        /// 字母的间距
+        int disLetter = (int) (wBorder * 0.055);
+        /// 边框距离每行的第一个数字的长度和宽度
+        int wBordNum = (int) (w * 0.055);
+        int hBordNum = (int) (h * 0.055 + 0.275 * hBorder);
+        /// 两个数字见的行列距离
+        int wNumNum = (int) (wBorder * 0.35);
+        int hNumNum = (int) (hBorder * 0.055 * 0.725);
+
+        /// 设置字母和数字的大小
+        /// 先随便设置一个大小来，测出当前大小时，字符的宽度
+        final float testTextSize = 20f;
+        paint.setTextSize(testTextSize);
+        Rect bound = new Rect();
+        String text = "[A]";
+        paint.getTextBounds(text,0,text.length(),bound);
+        /// 设置我们的单个选项的大小（每一行大约可容纳20个字母）
+        float finalSize = wBorder / 30;
+        finalSize = testTextSize * finalSize/bound.width();
+        paint.setTextSize(finalSize);
+
+        paint.setStyle(Paint.Style.FILL);
+        /// 去除锯齿
+        paint.setAntiAlias(true);
+        paint.setTypeface(Typeface.SANS_SERIF);
+
+        for (int i = 0; i < 54; i++){
+            int cols = i % 3 ;
+            int rows = i / 3 ;
+            canvas.drawText((i+1)+".",wBordNum + wNumNum * cols,hBordNum + hNumNum * rows,paint);
+            canvas.drawText("[A]",wBordNum + wNumNum * cols + disLetter ,hBordNum + hNumNum * rows,paint);
+            canvas.drawText("[B]",wBordNum + wNumNum * cols + disLetter * 2, hBordNum + hNumNum * rows,paint);
+            canvas.drawText("[C]",wBordNum + wNumNum * cols + disLetter * 3, hBordNum + hNumNum * rows,paint);
+            canvas.drawText("[D]",wBordNum + wNumNum * cols + disLetter * 4, hBordNum + hNumNum * rows,paint);
+        }
+
+        return bitmap;
     }
 
     private native GetDataFromNative getAnswerSheetInfo(int[] buf, int w, int h);

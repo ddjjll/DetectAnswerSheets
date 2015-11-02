@@ -12,9 +12,6 @@ public class GetDataFromNative {
     protected int nbAnswerSheet;
     protected boolean isRectangle;
     public GetDataFromNative(){}
-    protected void releaseResultInt(){
-        if (imageDataWarp != null){
-            imageDataWarp = null;
-        }
-    }
+
 }
+

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -7,49 +7,46 @@
 
     <TabHost
         android:id="@+id/myTabHost"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true" >
-
-        <FrameLayout
-            android:id="@android:id/tabcontent"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="45dp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="top">
-
-            <ImageView
-                android:layout_width="match_parent"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="fill_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/showDetectPicture"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter"/>
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/showErrorAnswersPicture"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter"/>
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/showCorrectAnswersPicture"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter"/>
-        </FrameLayout>
+                android:layout_weight="1"
+                android:layout_gravity="top">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:id="@+id/showDetectPicture"
+                    android:scaleType="fitXY"/>
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/showErrorAnswersPicture"
+                    android:scaleType="fitXY"/>
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/showCorrectAnswersPicture"
+                    android:scaleType="fitXY"/>
+            </FrameLayout>
+
+
             <TabWidget
                 android:id="@android:id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true" >
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_weight="10">
             </TabWidget>
-        </RelativeLayout>
+
+        </LinearLayout>
     </TabHost>
 
-</RelativeLayout>
+</LinearLayout>
