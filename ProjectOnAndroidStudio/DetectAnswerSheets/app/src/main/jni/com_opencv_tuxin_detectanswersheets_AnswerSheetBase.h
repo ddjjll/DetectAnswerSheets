@@ -7,6 +7,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#undef com_opencv_tuxin_detectanswersheets_AnswerSheetBase_SUM_OF_QUESTIONS
+#define com_opencv_tuxin_detectanswersheets_AnswerSheetBase_SUM_OF_QUESTIONS 54L
 /*
  * Class:     com_opencv_tuxin_detectanswersheets_AnswerSheetBase
  * Method:    getAnswerSheetInfo
@@ -23,6 +25,13 @@ JNIEXPORT jobject JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBa
 JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBase_getStudentAnswers
   (JNIEnv *, jobject, jintArray, jint, jint);
 
+/*
+ * Class:     com_opencv_tuxin_detectanswersheets_AnswerSheetBase
+ * Method:    getStudentNumbers
+ * Signature: ([III)[I
+ */
+JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBase_getStudentNumbers
+  (JNIEnv *, jobject, jintArray, jint, jint);
 
 #ifdef __cplusplus
 }

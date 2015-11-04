@@ -6,8 +6,8 @@
 using namespace cv;
 using namespace std;
 
-#define PERCENT_OP_B 0.5
-#define PERCENT_OP 0.45
+#define PERCENT_OP_B 0.3
+#define PERCENT_OP 0.3
 
 JNIEXPORT jobject JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBase_getAnswerSheetInfo
         (JNIEnv *env, jobject obj,jintArray buf,jint w, jint h){
@@ -283,6 +283,7 @@ JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheet
     Mat img_warp_gray;
     cvtColor(img_src,img_warp_gray,CV_BGR2GRAY);
 
+
     /// 把答题卡的选项分为18个部分，然后调整每一个部分的亮度，防止部分区域过暗或过亮，影响检测结果
     Mat roi;
     for (int y = 0; y < 6; y++){
@@ -323,10 +324,10 @@ JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheet
     jint studentAnswers[54] = { 0 };
 
     /// w_letter, h_letter 表示字母的大小
-    int w_letter = 0.039 * img_warp_gray.cols;
-    int h_letter = 0.023 * img_warp_gray.rows;
+    int w_letter = 0.0425 * img_warp_gray.cols;
+    int h_letter = 0.025 * img_warp_gray.rows;
     /// distance_letter 表示两个字母的间距
-    int distance_letter = 0.0525 * img_warp_gray.cols;
+    int distance_letter = 0.055 * img_warp_gray.cols;
 
     /// img_roi_rect 表示框取每一个选项(A,B,C,D)的矩形
     Mat img_roi_rect;
@@ -337,9 +338,10 @@ JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheet
         answers_number++;
         int cols = i % 3;
         int rows = i / 3;
+
         /// 字母 a 的位置的 x 值、 y 值
-        int px_letter_a = 0.087 * img_warp_gray.cols + 0.345 * cols * img_warp_gray.cols;
-        int py_letter_a = 0.29 * img_warp_gray.rows + 0.0395 * rows * img_warp_gray.rows;
+        int px_letter_a = 0.085 * img_warp_gray.cols + 0.3425 * cols * img_warp_gray.cols;
+        int py_letter_a = 0.2915 * img_warp_gray.rows + 0.0394 * rows * img_warp_gray.rows;
         /// 开始检测每一个选项
         for (int j = 1; j < 5; j++) {
             /// 选项计数加一
@@ -386,7 +388,76 @@ JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheet
     /// 把 studentAnswers[54] 转为 AnswerSheetBase 类的 studentAnswers
     jintArray jint_student_answers = env->NewIntArray(54);
     env->SetIntArrayRegion(jint_student_answers,0,54,studentAnswers);
+    env->ReleaseIntArrayElements(buf,cbuf,0);
+
+    return jint_student_answers;
+}
+
+JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBase_getStudentNumbers
+        (JNIEnv * env, jobject obj, jintArray buf, jint w, jint h){
+    jint *cbuf;
+    cbuf = env->GetIntArrayElements(buf, 0);
+    if (cbuf == NULL) {
+        return 0;
+    }
+    /// 把数据转为图片
+    Mat img_src(h,w,CV_8UC4,(unsigned char *) cbuf);
+
+    /// 转为灰度图
+    Mat img_warp_gray;
+    cvtColor(img_src,img_warp_gray,CV_BGR2GRAY);
+
+    jint student_number[8] = { -1 };/// 初始值设为 -1，表示没有图取
+
+    ///***********学号检测，检测图了哪些学号***********
+    /// 图像二值化，亮度超过100的（白）使其转为黑色（0），低于150的转为白色（255）
+    threshold(img_warp_gray, img_warp_gray, 100, 255, CV_THRESH_BINARY_INV);
+    /// 数字的宽和高
+    int width_num = w * 0.9 * 0.07 * 0.4;
+    int height_num = h * 0.95 * 0.07 * 0.265;
+
+    /// 两个数字间隔的 x，y 值
+    int x_num = w * 0.124 * 0.4;
+    int y_num = h * 0.095 * 0.265;
+
+    int cpt_pixel = 0;
+    int cpt_choose = 0;
+    /// 每一行的第一个数字的位置 x，y 的值
+    int px_first_num = w * 0.05 + w * 0.375  * 0.9;
+    int py_first_num = h * 0.025 + h * 0.007 * 0.95;
+    for (int cols = 0; cols < 8; cols++){
+        for (int rows = 0; rows < 10; rows++) {
+            Mat roi = img_warp_gray(Rect(px_first_num + x_num * rows, /// x 的位置
+                                         py_first_num + y_num * cols, /// y 的位置
+                                         width_num,  /// 所选取框的宽
+                                         height_num));///        高
+            for (int x = 0; x < roi.rows; x++) {
+                for (int y = 0; y < roi.cols; y++) {
+                    //检测每一点的像素，如果等于255，像素计数加一
+                    if(roi.at<uchar>(x,y) == 255){
+                        cpt_pixel++;
+                    }
+                }
+            }
+            /// 累计达到 255 的像素值的总数如果大于所选框的0.7，认为图取了该数字
+            if (cpt_pixel > roi.rows * roi.cols * 0.4){
+                student_number[cols] = rows;
+                cpt_choose++;
+            }
+            cpt_pixel = 0;
+        }
+        /// 检测到图取了两次，让这个号码为 -1，方便之后检查是否正确
+        if (cpt_choose != 1){
+            student_number[cols] = -1;
+        }
+        cpt_choose = 0;
+    }
+    img_warp_gray = Mat();
+
+
+    jintArray jint_student_number = env->NewIntArray(8);
+    env->SetIntArrayRegion(jint_student_number,0,8,student_number);
 
     env->ReleaseIntArrayElements(buf,cbuf,0);
-    return jint_student_answers;
+    return jint_student_number;
 }

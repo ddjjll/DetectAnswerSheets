@@ -3,12 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    tools:context="com.opencv.tuxin.detectanswersheets.ShowPhotoActivity">
+    tools:context="com.opencv.tuxin.detectanswersheets.ShowPhotoActivity"
+    android:orientation="horizontal">
+
 
     <TabHost
         android:id="@+id/myTabHost"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
+        <ProgressBar
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:id="@+id/progressBar"/>
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
