@@ -418,7 +418,7 @@ JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheet
 
     /// 两个数字间隔的 x，y 值
     int x_num = w * 0.124 * 0.4;
-    int y_num = h * 0.095 * 0.265;
+    int y_num = h * 0.097 * 0.265;
 
     int cpt_pixel = 0;
     int cpt_choose = 0;
@@ -439,7 +439,7 @@ JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheet
                     }
                 }
             }
-            /// 累计达到 255 的像素值的总数如果大于所选框的0.7，认为图取了该数字
+            /// 累计达到 255 的像素值的总数如果大于所选框的0.4，认为图取了该数字
             if (cpt_pixel > roi.rows * roi.cols * 0.4){
                 student_number[cols] = rows;
                 cpt_choose++;

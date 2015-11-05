@@ -2,4 +2,12 @@
     <string name="app_name">DetectAnswerSheets</string>
     <string name="choosePhoto">从相册中选择</string>
     <string name="createAnswerSheet">创建答题卡</string>
+    <string name="checkStudentNumber">查看学号</string>
+    <string name="saveData">记录数据</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="examName">考试名</string>
+    <string name="studentNumber">学号</string>
+    <string name="saveErrorPicture">储存错题照片</string>
+    <string name="saveCorrectPicture">储存答案照片</string>
 </resources>

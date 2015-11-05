@@ -8,9 +8,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.pdf.PdfDocument;
 import android.os.Environment;
-import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,8 +25,11 @@ public class AnswerSheetBase{
     private int[] studentAnswers = new int[SUM_OF_QUESTIONS];
     private int[] resultInt;
     private int[] correctAnswers;
-    private int[] studentNumber;
+    protected int[] studentNumbers = null;
     private Bitmap warpPicture;
+    private Bitmap correctAnswersPicture;
+    private Bitmap errorAnswersPicture;
+    private boolean isGetAnswer = false;
 
     private int wResize;
     private int hResize;
@@ -152,17 +153,32 @@ public class AnswerSheetBase{
         }*/
     }
 
+    protected int[] getStudentAnswers(){
+        if (!isGetAnswer)
+            setStudentAnswers();
+        return studentAnswers;
+    }
+    private void setStudentAnswers(){
+        if (imgPath != null && !isImgFormPathTooSmall() && dataFromNative.isRectangle) {
+            studentAnswers = getStudentAnswers(dataFromNative.imageDataWarp, wResize, hResize);
+        } else { /// 如果没有检测成功
+            for (int i = 0; i < SUM_OF_QUESTIONS; i++)
+                studentAnswers[i] = 0;
+        }
+        isGetAnswer = true;
+    }
+
     /*  得到显示错题的图片，用 studentAnswers 和 correctAnswers
      *  做比较，然后圈出不一样的题号，即错题的题号                       */
     protected Bitmap getErrorAnswersPicture(){
-        Bitmap errorAnswersPicture = null;
-        /// 调用 native 方法，得到学生的答案, 如果检测成功
-        if (imgPath != null && !isImgFormPathTooSmall() && dataFromNative.isRectangle) {
-            studentAnswers = getStudentAnswers(dataFromNative.imageDataWarp, wResize, hResize);
-
-            //for (int i = 0; i < studentAnswers.length; i++) {
-              //  Log.e(TAG, "studentAnswers" + (i + 1) + " = " + studentAnswers[i]);
-            //}
+        //for (int i = 0; i < studentAnswers.length; i++) {
+          //  Log.e(TAG, "studentAnswers" + (i + 1) + " = " + studentAnswers[i]);
+        //}
+        /// 检查是否已经得到学生的答案
+        if (!isGetAnswer){
+            /// 若没有，就调用 native 方法得到 studentAnswers
+            setStudentAnswers();
+        } else {
             /// 按质量压缩图片避免同时存在三张很大的图片
             errorAnswersPicture = compressByQuality(warpPicture).copy(Bitmap.Config.RGB_565, true);
             Canvas canvas = new Canvas(errorAnswersPicture);
@@ -180,22 +196,13 @@ public class AnswerSheetBase{
                     canvas.drawCircle(cx, cy, radius, paint);
                 }
             }
-        } else { /// 如果没有检测成功
-            for (int i = 0; i < SUM_OF_QUESTIONS; i++)
-                studentAnswers[i] = 0;
         }
-        /*int cx=100;
-        int cy=100;
-        int radius=20;
-        canvas.drawCircle(cx, cy, radius, paint);*/
-        //chooseView.setImageBitmap(warpPicture);
         return errorAnswersPicture;
     }
+    /*  得到显示正确答案的图片，每一个正确的答案，都用一个红色的矩形框起来   */
     protected Bitmap getCorrectAnswersPicture(){
-        Bitmap correctAnswersPicture = null;
-
         if (imgPath != null && !isImgFormPathTooSmall() && dataFromNative.isRectangle) {
-            correctAnswersPicture = compressByQuality(warpPicture).copy(Bitmap.Config.RGB_565,true);
+            correctAnswersPicture = compressByQuality(warpPicture).copy(Bitmap.Config.RGB_565, true);
             Canvas canvas = new Canvas(correctAnswersPicture);
             Paint paint = new Paint();
             paint.setColor(Color.RED);
@@ -214,16 +221,16 @@ public class AnswerSheetBase{
                 int h_letter = (int) (0.025 * hResize);
                 int px_letter = (int) (0.055 * wResize);
 
-            for (int j = 1; j < 5; j ++) {
-                //px_letter_a += j * px_letter;
-                if(correctAnswers[i] == j)
-                    canvas.drawRect(new Rect(px_letter_a + (j-1) * px_letter,
-                                            py_letter_a,
-                                            px_letter_a + w_letter + (j-1) * px_letter,
-                                            py_letter_a + h_letter), paint);
+                for (int j = 1; j < 5; j++) {
+                    //px_letter_a += j * px_letter;
+                    if (correctAnswers[i] == j)
+                        canvas.drawRect(new Rect(px_letter_a + (j - 1) * px_letter,
+                                py_letter_a,
+                                px_letter_a + w_letter + (j - 1) * px_letter,
+                                py_letter_a + h_letter), paint);
 
-            }
-               /* 查看所图取的选项
+                }
+               /* //查看所图取的选项
                 for (int j = 1; j < 5; j++) {
                     //px_letter_a += j * px_letter;
                     if (studentAnswers[i] == j)
@@ -234,26 +241,28 @@ public class AnswerSheetBase{
 
                 }*/
             }
-            /// 查看学生所图取的学号
-            int widthNumber = (int) ( wResize * 0.9 * 0.07 * 0.4);
-            int heightNumber = (int) ( hResize * 0.95 * 0.07 * 0.265);
+
+
+            /// 查看学号部分的读取情况
+            int widthNumber = (int) (wResize * 0.9 * 0.07 * 0.4);
+            int heightNumber = (int) (hResize * 0.95 * 0.07 * 0.265);
 
             int wNumNum = (int) (wResize * 0.124 * 0.4);
-            int hNumNum = (int) (hResize * 0.0975 * 0.265);
+            int hNumNum = (int) (hResize * 0.097 * 0.265);
 
-            int wNumBord = (int) (wResize * 0.05 + wResize * 0.375  * 0.9);
-            int hNumBord = (int) (hResize * 0.025 + hResize * 0.007 * 0.95 );
-            for (int i = 0; i < 80; i++){
-                int rows = i / 10;
-                int cols = i % 10;
+            int wNumBord = (int) (wResize * 0.05 + wResize * 0.375 * 0.9);
+            int hNumBord = (int) (hResize * 0.025 + hResize * 0.007 * 0.95);
 
-                canvas.drawRect(new Rect(wNumBord + wNumNum * rows,
-                                    hNumBord + hNumNum * cols,
-                                    wNumBord + wNumNum * rows + widthNumber,
-                                    hNumBord + hNumNum * cols + heightNumber),paint);
+            for (int i = 0; i < 80; i++) {
+                int rows = i % 10;
+                int cols = i / 10;
+                canvas.drawRect(new Rect(wNumBord + wNumNum * cols,
+                        hNumBord + hNumNum * rows,
+                        wNumBord + wNumNum * cols + widthNumber,
+                        hNumBord + hNumNum * rows + heightNumber), paint);
+
             }
-
-        } else {
+        }else {
         ///添加说明图片
         }
         return correctAnswersPicture;
@@ -391,12 +400,17 @@ public class AnswerSheetBase{
     /*  调用 native 方法，得到学生的学号，如果某个数字检测错误，该
      *  数字会等于 -1，我们可以检测每一个数字是否大于 -1，来得到正确
      *  的结果。                                                */
-    protected int[] getStudentNumber(){
-        studentNumber = getStudentNumbers(resultInt,wResize, hResize);
-        for (int i = 0; i < studentNumber.length; i++)
-            Log.e(TAG, "studentNumber" + i + " = " + studentNumber[i]);
-        return studentNumber;
+    protected int[] getStudentNumbers(){
+        if (this.studentNumbers == null && imgPath != null && !isImgFormPathTooSmall() && dataFromNative.isRectangle) {
+            this.studentNumbers = getStudentNumbers(resultInt, wResize, hResize);
+        }
+        return this.studentNumbers;
     }
+
+    /*  把创建好的答题卡写入 SD 卡中，存好之后，就可以在电脑中打开，
+     *  然后用 A4 纸打印出来。
+     *  目前为止，我们的程序不支持自定义答题卡，所以只存储一张固定的答题卡。
+     *  如果以后支持自定义，记得定义存储的地址和不同图片的名字。*/
     protected static void saveAnswerSheetOnSDCard() throws IOException {
         Bitmap bitmap = createAnswerSheet();
         /// 之前创建的 AnswerSheet 只有 A4 纸大小的一半，所以创建一张符合 A4 纸大小的图片
@@ -410,11 +424,9 @@ public class AnswerSheetBase{
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         newBitmap.compress(Bitmap.CompressFormat.PNG,100,bytes);
 
-        File file = new File(Environment.getExternalStorageDirectory() + "/DetectAnswerSheet");
-        if (!file.exists()){
-            file.mkdir();
-        }
-        file = new File(Environment.getExternalStorageDirectory() + "/DetectAnswerSheet/AnswerSheet.png");
+
+        File file = new File(Environment.getExternalStorageDirectory() +
+                                    "/DetectAnswerSheet/Image/AnswerSheet.png");
         if (file.exists()){
             file.delete();
         }
