@@ -11,11 +11,14 @@ import android.view.View;
 import android.widget.Button;
 
 import java.io.File;
+import java.io.IOException;
 
 public class MainActivity extends Activity {
     private static final int CHOOSE_PHOTO = 1;
+    private static final int TAKE_PHOTO = 2;
     private Button btnChoosePhoto;
     private Button btnCreateAnswerSheet;
+    private Button btnSystemCamera;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,22 +44,54 @@ public class MainActivity extends Activity {
                 MainActivity.this.startActivity(intent);
             }
         });
+        btnSystemCamera = (Button) findViewById(R.id.btnSystemCamera);
+        btnSystemCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File file = new File(Environment.getExternalStorageDirectory() +
+                        "/DetectAnswerSheet/Image/tempImage1.png");
+                try {
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                    file.createNewFile();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Uri imageUri = Uri.fromFile(file);
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
+                startActivityForResult(intent, TAKE_PHOTO);
+            }
+        });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if ((requestCode == CHOOSE_PHOTO) && (resultCode == RESULT_OK) && (data != null)){
-            Uri choosePhoto = data.getData();
+        switch (requestCode) {
+            case CHOOSE_PHOTO:
+                if ((resultCode == RESULT_OK) && (data != null)) {
+                Uri choosePhoto = data.getData();
 
-            String[] filePath = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(choosePhoto,filePath,null,null,null);
-            cursor.moveToFirst();
-            String imgPath = cursor.getString(cursor.getColumnIndex(filePath[0]));
+                String[] filePath = {MediaStore.Images.Media.DATA};
+                Cursor cursor = getContentResolver().query(choosePhoto, filePath, null, null, null);
+                cursor.moveToFirst();
+                String imgPath = cursor.getString(cursor.getColumnIndex(filePath[0]));
 
-            Intent intent = new Intent(MainActivity.this,ShowPhotoActivity.class);
-            intent.putExtra("imgPath",imgPath);
-            startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, ShowPhotoActivity.class);
+                intent.putExtra("imgPath", imgPath);
+                startActivity(intent);
+            }
+                break;
+            case TAKE_PHOTO:
+                String imgPath = Environment.getExternalStorageDirectory() +
+                        "/DetectAnswerSheet/Image/tempImage1.png";
+                Intent intent = new Intent(MainActivity.this, ShowPhotoActivity.class);
+                intent.putExtra("imgPath", imgPath);
+                startActivity(intent);
         }
     }
 

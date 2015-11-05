@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">DetectAnswerSheets</string>
     <string name="choosePhoto">从相册中选择</string>
+    <string name="systemCamera">调用系统相机</string>
     <string name="createAnswerSheet">创建答题卡</string>
     <string name="checkStudentNumber">查看学号</string>
     <string name="saveData">记录数据</string>

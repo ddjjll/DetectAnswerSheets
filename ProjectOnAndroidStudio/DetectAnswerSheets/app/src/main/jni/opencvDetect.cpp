@@ -6,8 +6,8 @@
 using namespace cv;
 using namespace std;
 
-#define PERCENT_OP_B 0.3
-#define PERCENT_OP 0.3
+#define PERCENT_OP_B 0.28
+#define PERCENT_OP 0.28
 
 JNIEXPORT jobject JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBase_getAnswerSheetInfo
         (JNIEnv *env, jobject obj,jintArray buf,jint w, jint h){
@@ -155,8 +155,9 @@ JNIEXPORT jobject JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBa
         blur(abs_gradient, abs_gradient, Size(3,3));
         threshold(abs_gradient, abs_gradient, 100, 255,  CV_THRESH_BINARY);
         /// 膨胀、腐蚀得到更好的轮廓
-        erode(abs_gradient, abs_gradient, Mat(), Point(-1, -1), 1);
         dilate(abs_gradient, abs_gradient, Mat(), Point(-1, -1), 1);
+        erode(abs_gradient, abs_gradient, Mat(), Point(-1, -1), 3);
+        dilate(abs_gradient, abs_gradient, Mat(), Point(-1, -1), 2);
 
         Canny(abs_gradient, abs_gradient, 50, 200, 3);
 
@@ -402,15 +403,14 @@ JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheet
     }
     /// 把数据转为图片
     Mat img_src(h,w,CV_8UC4,(unsigned char *) cbuf);
-
     /// 转为灰度图
     Mat img_warp_gray;
-    cvtColor(img_src,img_warp_gray,CV_BGR2GRAY);
 
-    jint student_number[8] = { -1 };/// 初始值设为 -1，表示没有图取
+    jint student_number[8] = { -1,-1,-1,-1,-1,-1,-1,-1 };/// 初始值设为 -1，表示没有图取
 
     ///***********学号检测，检测图了哪些学号***********
     /// 图像二值化，亮度超过100的（白）使其转为黑色（0），低于150的转为白色（255）
+    cvtColor(img_src,img_warp_gray,CV_BGR2GRAY);
     threshold(img_warp_gray, img_warp_gray, 100, 255, CV_THRESH_BINARY_INV);
     /// 数字的宽和高
     int width_num = w * 0.9 * 0.07 * 0.4;
@@ -424,7 +424,7 @@ JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheet
     int cpt_choose = 0;
     /// 每一行的第一个数字的位置 x，y 的值
     int px_first_num = w * 0.05 + w * 0.375  * 0.9;
-    int py_first_num = h * 0.025 + h * 0.007 * 0.95;
+    int py_first_num = h * 0.022 + h * 0.007 * 0.95;
     for (int cols = 0; cols < 8; cols++){
         for (int rows = 0; rows < 10; rows++) {
             Mat roi = img_warp_gray(Rect(px_first_num + x_num * rows, /// x 的位置
@@ -439,18 +439,23 @@ JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheet
                     }
                 }
             }
-            /// 累计达到 255 的像素值的总数如果大于所选框的0.4，认为图取了该数字
-            if (cpt_pixel > roi.rows * roi.cols * 0.4){
+            /// 累计达到 255 的像素值的总数如果大于所选框的0.5，认为图取了该数字
+
+            if (cpt_pixel > roi.rows * roi.cols * 0.4) {
                 student_number[cols] = rows;
                 cpt_choose++;
             }
+
             cpt_pixel = 0;
         }
         /// 检测到图取了两次，让这个号码为 -1，方便之后检查是否正确
-        if (cpt_choose != 1){
+        /*if (cpt_choose > 1){
+            student_number[cols] = -2;
+        }
+        if (cpt_choose == 0){
             student_number[cols] = -1;
         }
-        cpt_choose = 0;
+        cpt_choose = 0;*/
     }
     img_warp_gray = Mat();
 

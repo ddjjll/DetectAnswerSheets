@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -152,12 +153,17 @@ public class AnswerSheetBase{
             Log.e(TAG,"correctAnswers" + i + " = " + correctAnswers[i]);
         }*/
     }
-
+    /*  写一个 getter，为了外部调用方便，但是内部也需要知道 studentAnswers，
+     *  所以先调用 setStudentAnswers() 为了给内部的 studentAnswers 赋值，
+     *  为了防止调用两次 native 方法得到 studentAnswers，我们设置一个
+     *  bool isGetAnswer，如果它为真，我们就不需要再次调用 native，如果为
+     *  false，就先调用 setStudentAnswers()                          */
     protected int[] getStudentAnswers(){
         if (!isGetAnswer)
             setStudentAnswers();
         return studentAnswers;
     }
+    /*  调用 native 方法，得到 studentAnswers                          */
     private void setStudentAnswers(){
         if (imgPath != null && !isImgFormPathTooSmall() && dataFromNative.isRectangle) {
             studentAnswers = getStudentAnswers(dataFromNative.imageDataWarp, wResize, hResize);
@@ -174,11 +180,8 @@ public class AnswerSheetBase{
         //for (int i = 0; i < studentAnswers.length; i++) {
           //  Log.e(TAG, "studentAnswers" + (i + 1) + " = " + studentAnswers[i]);
         //}
-        /// 检查是否已经得到学生的答案
-        if (!isGetAnswer){
-            /// 若没有，就调用 native 方法得到 studentAnswers
+        if (imgPath != null && !isImgFormPathTooSmall() && dataFromNative.isRectangle) {
             setStudentAnswers();
-        } else {
             /// 按质量压缩图片避免同时存在三张很大的图片
             errorAnswersPicture = compressByQuality(warpPicture).copy(Bitmap.Config.RGB_565, true);
             Canvas canvas = new Canvas(errorAnswersPicture);
@@ -187,6 +190,7 @@ public class AnswerSheetBase{
             paint.setStrokeWidth(4.5f);
             paint.setStyle(Paint.Style.STROKE);
             for (int i = 0; i < correctAnswers.length; i++) {
+               // Log.e(TAG,"studentAnswers" + i + " = " + studentAnswers[i] );
                 if (studentAnswers[i] != correctAnswers[i]) {
                     int cols = i % 3;
                     int rows = i / 3;
@@ -196,6 +200,7 @@ public class AnswerSheetBase{
                     canvas.drawCircle(cx, cy, radius, paint);
                 }
             }
+        } else { /// 如果没有检测成功
         }
         return errorAnswersPicture;
     }
@@ -244,14 +249,14 @@ public class AnswerSheetBase{
 
 
             /// 查看学号部分的读取情况
-            int widthNumber = (int) (wResize * 0.9 * 0.07 * 0.4);
-            int heightNumber = (int) (hResize * 0.95 * 0.07 * 0.265);
+            /*int widthNumber = (int) (wResize * 0.9 * 0.08 * 0.4);
+            int heightNumber = (int) (hResize * 0.95 * 0.08 * 0.265);
 
             int wNumNum = (int) (wResize * 0.124 * 0.4);
             int hNumNum = (int) (hResize * 0.097 * 0.265);
 
             int wNumBord = (int) (wResize * 0.05 + wResize * 0.375 * 0.9);
-            int hNumBord = (int) (hResize * 0.025 + hResize * 0.007 * 0.95);
+            int hNumBord = (int) (hResize * 0.022 + hResize * 0.007 * 0.95);
 
             for (int i = 0; i < 80; i++) {
                 int rows = i % 10;
@@ -260,8 +265,7 @@ public class AnswerSheetBase{
                         hNumBord + hNumNum * rows,
                         wNumBord + wNumNum * cols + widthNumber,
                         hNumBord + hNumNum * rows + heightNumber), paint);
-
-            }
+            }*/
         }else {
         ///添加说明图片
         }

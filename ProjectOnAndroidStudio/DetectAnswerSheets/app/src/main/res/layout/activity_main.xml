@@ -20,4 +20,11 @@
         android:text="@string/choosePhoto"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/btnCreateAnswerSheet"/>
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnSystemCamera"
+        android:text="@string/systemCamera"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/btnChoosePhoto"/>
 </RelativeLayout>
