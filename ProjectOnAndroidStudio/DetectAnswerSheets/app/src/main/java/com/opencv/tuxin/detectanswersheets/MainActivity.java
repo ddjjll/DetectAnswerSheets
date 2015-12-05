@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+
 import java.io.File;
 import java.io.IOException;
 
@@ -31,19 +32,23 @@ public class MainActivity extends Activity {
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent,"Select Picture"),CHOOSE_PHOTO);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), CHOOSE_PHOTO);
             }
         });
 
-        /// 创建 createAnswerSheet 按钮，并设置监听器
+        /// 创建 drawAnswerSheet 按钮，并设置监听器
         btnCreateAnswerSheet = (Button) findViewById(R.id.btnCreateAnswerSheet);
         btnCreateAnswerSheet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,ShowCreateAnswerSheetActivity.class);
+                Intent intent = new Intent(MainActivity.this, ShowCreateAnswerSheetActivity.class);
                 MainActivity.this.startActivity(intent);
             }
         });
+
+        
+
+        /// 创建 systemCamera 按钮，并设置监听器
         btnSystemCamera = (Button) findViewById(R.id.btnSystemCamera);
         btnSystemCamera.setOnClickListener(new View.OnClickListener() {
             @Override

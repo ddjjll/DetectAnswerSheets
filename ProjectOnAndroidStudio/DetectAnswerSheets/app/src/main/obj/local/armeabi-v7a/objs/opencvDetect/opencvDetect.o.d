@@ -18,16 +18,7 @@ obj/local/armeabi-v7a/objs/opencvDetect/opencvDetect.o: \
  E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/linux/types.h \
  E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/machine/kernel.h \
  E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/sys/sysmacros.h \
- E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/stdlib.h \
- E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/string.h \
- E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/malloc.h \
- E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/alloca.h \
- E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/strings.h \
- E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/memory.h \
- E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/opencv.hpp \
- E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core.hpp \
- E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/cvdef.h \
- E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/hal/defs.h \
+ E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/Math.h \
  E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/limits.h \
  E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/sys/limits.h \
  E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/linux/limits.h \
@@ -35,6 +26,10 @@ obj/local/armeabi-v7a/objs/opencvDetect/opencvDetect.o: \
  E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/machine/limits.h \
  E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/sys/syslimits.h \
  E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/asm/page.h \
+ E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/opencv.hpp \
+ E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core.hpp \
+ E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/cvdef.h \
+ E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/hal/defs.h \
  E:/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cmath \
  E:/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/algorithm \
  E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/version.hpp \
@@ -133,25 +128,7 @@ E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/machine/kernel.h:
 
 E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/sys/sysmacros.h:
 
-E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/stdlib.h:
-
-E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/string.h:
-
-E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/malloc.h:
-
-E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/alloca.h:
-
-E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/strings.h:
-
-E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/memory.h:
-
-E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/opencv.hpp:
-
-E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core.hpp:
-
-E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/cvdef.h:
-
-E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/hal/defs.h:
+E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/Math.h:
 
 E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/limits.h:
 
@@ -166,6 +143,14 @@ E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/machine/limits.h:
 E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/sys/syslimits.h:
 
 E:/sdk/ndk-bundle/platforms/android-3/arch-arm/usr/include/asm/page.h:
+
+E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/opencv.hpp:
+
+E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core.hpp:
+
+E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/cvdef.h:
+
+E:/OpenCV-android-sdk/sdk/native/jni/include/opencv2/hal/defs.h:
 
 E:/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cmath:
 

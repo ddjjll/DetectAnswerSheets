@@ -17,7 +17,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ShowPhotoActivity" >
+        <activity android:name=".ShowPhotoActivity"
+                  android:screenOrientation="nosensor">
         </activity>
         <activity android:name=".ShowCreateAnswerSheetActivity" >
         </activity>

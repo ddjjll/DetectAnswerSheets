@@ -15,7 +15,7 @@ extern "C" {
  * Signature: ([III)Lcom/opencv/tuxin/detectanswersheets/GetDataFromNative;
  */
 JNIEXPORT jobject JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBase_getAnswerSheetInfo
-  (JNIEnv *, jobject, jintArray, jint, jint);
+  (JNIEnv *, jobject, jintArray, jint, jint, jint, jint);
 
 /*
  * Class:     com_opencv_tuxin_detectanswersheets_AnswerSheetBase
@@ -23,7 +23,7 @@ JNIEXPORT jobject JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBa
  * Signature: ([III)[I
  */
 JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBase_getStudentAnswers
-  (JNIEnv *, jobject, jintArray, jint, jint);
+  (JNIEnv *, jobject, jintArray, jint, jint, jfloat, jint);
 
 /*
  * Class:     com_opencv_tuxin_detectanswersheets_AnswerSheetBase
@@ -31,7 +31,7 @@ JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheet
  * Signature: ([III)[I
  */
 JNIEXPORT jintArray JNICALL Java_com_opencv_tuxin_detectanswersheets_AnswerSheetBase_getStudentNumbers
-  (JNIEnv *, jobject, jintArray, jint, jint);
+  (JNIEnv *, jobject, jintArray, jint, jint, jfloat);
 
 #ifdef __cplusplus
 }

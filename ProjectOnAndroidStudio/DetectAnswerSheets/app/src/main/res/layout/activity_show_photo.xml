@@ -4,8 +4,8 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     tools:context="com.opencv.tuxin.detectanswersheets.ShowPhotoActivity"
-    android:orientation="horizontal">
 
+    android:orientation="horizontal">
 
     <TabHost
         android:id="@+id/myTabHost"
@@ -26,24 +26,55 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_gravity="top">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-                <ImageView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:id="@+id/showDetectPicture"
-                    android:scaleType="fitXY"/>
-                <ImageView
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/showDetectPicture"
+                        android:scaleType="fitXY"
+                        />
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/showSecDetPic"
+                        android:scaleType="fitXY"
+                        />
+                </LinearLayout>
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/showErrorAnswersPicture"
-                    android:scaleType="fitXY"/>
-                <ImageView
+                    android:orientation="vertical">
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/showErrAnsPic"
+                        android:scaleType="fitXY"/>
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/showSecErrAnsPic"
+                        android:scaleType="fitXY"/>
+                </LinearLayout>
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/showCorrectAnswersPicture"
-                    android:scaleType="fitXY"/>
+                    android:orientation="vertical">
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/showCorrAnsPic"
+                        android:scaleType="fitXY"/>
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/showSecCorrAnsPic"
+                        android:scaleType="fitXY"/>
+                </LinearLayout>
             </FrameLayout>
-
 
             <TabWidget
                 android:id="@android:id/tabs"
