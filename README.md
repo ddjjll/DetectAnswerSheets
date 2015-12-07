@@ -64,4 +64,4 @@ opencv 里，有 findContours() 可以让我们提取出 canny() 检测之后的
 
 
 ## 流程图 ##
-![process](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/process.jpg) 
+![process](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/process.png) 
