@@ -9,7 +9,7 @@
   
 ## 效果图 ##
 ![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_1_paper.gif)  
-![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_1_paper.gif)
+![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_2_paper.gif)
 ## 答题卡的设计 ##
 这个部分是最基础的部分，后面核心的检测代码得围绕着这个部分来写。  
 ###目标功能：  
