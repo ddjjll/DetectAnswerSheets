@@ -8,8 +8,8 @@
 这时候如果有一个软件，每次可以扫描多张答题卡，能自动记录每张答题卡的个人信息（比如学号什么的），能自动帮你计算每一张答题卡的得分，帮你统计每一题的正确率，并且记录每一个学生多次测验的错题，肯定会很方便。  
   
 ## 效果图 ##
-![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_1_paper.gif)  
-![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_2_paper.gif)
+![答题卡_54题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_1_paper.gif)![答题卡_54题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_1_paper_err_pic.png)![答题卡_54题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_1_paper_corr_pic.png)  
+![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_2_paper.gif)![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_2_paper_err_pic.png)![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_2_paper_corr_pic.png)
 ## 答题卡的设计 ##
 这个部分是最基础的部分，后面核心的检测代码得围绕着这个部分来写。  
 ###目标功能：  
@@ -19,8 +19,8 @@
 ###已实现功能：  
 >没有加入弹窗和滑动条来让用户输入正确答案和修改题目数量，只能在程序里修改题目数量、答题卡的名字和正确答案。然后可以根据提供的这些信息，自动生成二维码，同时把正确答案存入数据库中。不把正确答案加入二维码中有两个原因：1.如果题目过多，会让二维码携带大量的信息，这会导致二维码变得复杂，增加解码的难度。2.二维码中携带正确答案后，所有的人都可以通过扫描该二维码得到正确答案的信息，这对于出题老师来说不是什么好事。    
 
-![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/AnswerSheet_21.png)![答题卡_54题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/AnswerSheet_54.png)  
-这些答题卡的样式很简单。左上角第一个框是学生的名字；下边的框是存放二维码；右边的图取框，是学生的学号；再右边是学科。对于不同题目数量的答题卡，我们根据题目数量，计算出所需的行数，再算出边框的高度。二维码的生成，我选择用 zxing 的 qr 二维码来进行封装，我们可通过 builder 来修改二维码的信息，不同的信息之间，用“：”来分隔，这样方便之后的提取。  
+![答题卡_54题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/AnswerSheet_54.png)  
+这些答题卡的样式很简单。左上角第一个框是学生的名字；下边的框是存放二维码；右边的图取框，是学生的学号；再右边是学科。对于不同题目数量的答题卡，我们根据题目数量，计算出所需的行数，再算出边框的高度。二维码的生成，我选择用 zxing 的 qr 二维码来进行封装，我们可通过 builder 来修改二维码的信息，不同的信息之间，用“：”来分隔，这样方便之后的提取。新建答题卡成功后，会在把答题卡储存在 sd 卡里，方便打印，因为设计的时候，答题卡的大小是根据 A4 纸来设计的，所以复制图片后直接打印就可以了。  
 代码不是很复杂，就不啰嗦了，直接参见 CreateAnswerSheet.java 中。  
 
 ## 答题卡的检测 ##
