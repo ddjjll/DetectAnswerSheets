@@ -8,8 +8,8 @@
 这时候如果有一个软件，每次可以扫描多张答题卡，能自动记录每张答题卡的个人信息（比如学号什么的），能自动帮你计算每一张答题卡的得分，帮你统计每一题的正确率，并且记录每一个学生多次测验的错题，肯定会很方便。  
   
 ## 效果图 ##
-![答题卡_54题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_1_paper.gif)![答题卡_54题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_1_paper_err_pic.png)![答题卡_54题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_1_paper_corr_pic.png)  
-![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_2_paper.gif)![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_2_paper_err_pic.png)![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_2_paper_corr_pic.png)
+![答题卡_54题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_1_paper.gif)  
+![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_2_paper.gif)
 ## 答题卡的设计 ##
 这个部分是最基础的部分，后面核心的检测代码得围绕着这个部分来写。  
 ###目标功能：  
@@ -40,7 +40,7 @@
 ![canny_result](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/example_canny_result.png)  
 在这个图片中，注意观察和光线交界的那一条边，它有些地方是不闭合的，也就是说我们的 A4 纸的边缘其实不是一条直线。如果我们直接利用这个图像来寻找最大和第二大的轮廓的话，我们会得到很诡异的情况：  
 ![canny_contours](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/canny_draw_contours.png)  
-这是因为用 canny() 方法得到的边缘，如果目标物体本身的轮廓不是特别清晰的话，我们的到的边缘实际上会存在断点的，所以我们会在 canny() 方法前需要先处理图像。这就是说直接食用用 canny() 检测，一些情况下是可行的，但是对于一些特殊的环境，效果会很差。  
+这是因为用 canny() 方法得到的边缘，如果目标物体本身的轮廓不是特别清晰的话，我们的到的边缘实际上会存在断点的，所以我们会在 canny() 方法前需要先处理图像。这就是说直接使用 canny() 检测，一些情况下是可行的，但是对于一些特殊的环境，效果会很差。  
 为了排除不同光线的干扰，我们需要采取别的方法。之前我有考虑过通过颜色的检测来区分黑色和其他颜色，从而得到合适的四边形。但是这个方法比直接检测边缘还不靠谱。因为在不同的光源下，我们人眼能够准确的区分黑色和其他的颜色，但是利用 rgb 色系 或者 hsv 色系检测的话，得到的结果会让人大失所望。  
 最后确认的方法是：在用 canny() 边缘检测之前，我们需要处理图像，找出包含高水平梯度和低垂直梯度的图像，然后二值化，接着进行膨胀和腐蚀的操作，最后在进行 canny() 操作，就可以得到较为清晰的轮廓。  
 ![new_canny](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/new_canny_contours.png)  
