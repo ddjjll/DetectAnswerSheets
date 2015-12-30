@@ -9,7 +9,9 @@
   
 ## 效果图 ##
 ![答题卡_54题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_1_paper.gif)  
-![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_2_paper.gif)
+<img src="https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/Screenshot_54_choose_pic.png" width="50%" height="50%"><img src="https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/Screenshot_54_wrap_pic.png" width="50%" height="50%"><img src="https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/Screenshot_54_err_pic.png" width="50%" height="50%"><img src="https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/Screenshot_54_corr_pic.png" width="50%" height="50%"><img src="https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/Screenshot_21_save_data.png" width="50%" height="50%">         
+![答题卡_21题](https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/scan_2_paper.gif)  
+<img src="https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/Screenshot_21_choose_pics.png" width="50%" height="50%"><img src="https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/Screenshot_21_wrap_pics.png" width="50%" height="50%"><img src="https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/Screenshot_21_err_pics.png" width="50%" height="50%"><img src="https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/Screenshot_21_corr_pics.png" width="50%" height="50%"><img src="https://github.com/TuXin-GitHub/DetectAnswerSheets/blob/master/image/Screenshot_21_save_data.png" width="50%" height="50%"> 
 ## 答题卡的设计 ##
 这个部分是最基础的部分，后面核心的检测代码得围绕着这个部分来写。  
 ###目标功能：  
